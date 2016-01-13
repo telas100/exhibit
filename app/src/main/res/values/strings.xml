@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Exhibit</string>
+
+    <string name="society.default">Tipstr</string>
+    <string name="society">Decathlon</string>
+    <string name="welcomeMessage">Bienvenue sur la borne de l\'entreprise</string>
+    <string name="welcomeText">Touchez pour continuer</string>
+    <string name="fileSelectorMessage">Fichiers disponibles</string>
+    <string name="fileSelectorButtonSendText">Envoyer à mon addresse email</string>
+    <string name="fileSelectorButtonReturnText">Retour</string>
+    <string name="fileSelectorFileSelection">Envoyer</string>
+    <string name="fileSaveMessage">Veuillez passer votre bracelet sur le lecteur NFC...</string>
+    <string name="fileSaveManageMessage">Retour d\'expèrience</string>
+</resources>

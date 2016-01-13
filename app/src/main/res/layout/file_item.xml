@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="120sp"
+    android:layout_height="120sp"
+    android:padding="10sp"
+    android:orientation="vertical"
+    android:id="@+id/fileLayout"
+    android:onClick="onFileSelected">
+
+    <TextView
+        android:id="@+id/tvFileTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="20sp" />
+
+    <ImageView
+        android:id="@+id/ivFileImage"
+        android:layout_width="fill_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp" />
+
+    <CheckBox
+        android:id="@+id/cbFileSend"
+        android:layout_width="fill_parent"
+        android:layout_height="20sp"
+        android:text="@string/fileSelectorFileSelection"
+        android:textSize="15sp"/>
+
+</LinearLayout>

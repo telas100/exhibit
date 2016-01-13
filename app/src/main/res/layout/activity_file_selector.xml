@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="android.exhibit.FileSelector"
+    android:id="@+id/rlFileSelector"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fileSelectorMessage"
+        android:id="@+id/textView"
+        android:textStyle="bold"
+        android:textColor="#676df8"
+        android:textSize="26sp"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/btnSend" />
+
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gvFiles"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/btnSend"
+        android:columnWidth="150sp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10sp"
+        android:horizontalSpacing="50sp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:padding="10sp" />
+
+    <Button
+        android:layout_width="292dp"
+        android:layout_height="wrap_content"
+        android:text="@string/fileSelectorButtonSendText"
+        android:id="@+id/btnSend"
+        android:layout_gravity="bottom|right"
+        android:contextClickable="false"
+        android:enabled="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/gvFiles"
+        android:layout_alignEnd="@+id/gvFiles" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnReturn"
+        android:layout_gravity="bottom|right"
+        android:contextClickable="false"
+        android:enabled="true"
+        android:layout_alignTop="@+id/btnSend"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/fileSelectorButtonReturnText" />
+
+</RelativeLayout>
