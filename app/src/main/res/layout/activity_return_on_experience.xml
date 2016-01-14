@@ -10,8 +10,8 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/tvReturnOnExperience"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
         android:minHeight="100sp"
-        android:minWidth="100sp" />
+        android:minWidth="100sp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

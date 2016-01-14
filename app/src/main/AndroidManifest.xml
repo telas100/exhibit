@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="fr.android.exhibit.activities.MainActivity"
             android:configChanges="screenSize"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme">
@@ -24,21 +24,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FileSelector"
+            android:name="fr.android.exhibit.activities.FileSelector"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".FileSave"
+            android:name="fr.android.exhibit.activities.FileSave"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".ReturnOnExperience"
+            android:name="fr.android.exhibit.activities.ReturnOnExperience"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme"/>
 
         <service
-            android:name=".BluetoothLEService"
+            android:name="fr.android.exhibit.services.BluetoothLEService"
             android:exported="false" />
+
+        <meta-data android:name="AA_DB_NAME" android:value="Exhibit.db" />
+        <meta-data android:name="AA_DB_VERSION" android:value="1" />
     </application>
 
 </manifest>
