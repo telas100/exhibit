@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package fr.android.exhibit.data;
+package fr.android.exhibit.model;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;

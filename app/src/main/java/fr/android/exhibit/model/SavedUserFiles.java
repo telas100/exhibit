@@ -1,4 +1,4 @@
-package fr.android.exhibit.data;
+package fr.android.exhibit.model;
 
 import java.io.Serializable;
 

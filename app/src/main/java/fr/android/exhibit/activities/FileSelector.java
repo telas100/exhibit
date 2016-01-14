@@ -2,6 +2,8 @@ package fr.android.exhibit.activities;
 
 import android.content.Intent;
 import android.exhibit.R;
+import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,8 +13,11 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import fr.android.exhibit.adapters.FileDisplayAdapter;
+import fr.android.exhibit.model.LiteFile;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileSelector extends AppCompatActivity {
@@ -21,13 +26,18 @@ public class FileSelector extends AppCompatActivity {
     private Button mButtonReturn;
     private GridView mFileView;
     private static int mToSend = 0;
-    private List<String> mFiles;
+    private List<String> mFilesString;
+    private static File mDirectory;
+    private static List<File> mFiles;
+
+    private static String FILE_LOCATION = "";
 
     private String[] mAvailableFiles={
             "File1", "File2",
             "File3", "File4",
             "File5"
     };
+
     private Integer[] mFileImageRessources = {
             R.mipmap.ic_launcher,R.mipmap.ic_launcher,
             R.mipmap.ic_launcher,R.mipmap.ic_launcher,
@@ -44,10 +54,10 @@ public class FileSelector extends AppCompatActivity {
         mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] parcel = new String[mFiles.size()];
-                mFiles.toArray(parcel);
+                String[] parcel = new String[mFilesString.size()];
+                mFilesString.toArray(parcel);
                 Intent intent = new Intent(FileSelector.this, FileSave.class);
-                intent.putExtra("EXTRA_SELECTED_FILES",parcel);
+                intent.putExtra("EXTRA_SELECTED_FILES", parcel);
                 startActivity(intent);
             }
         });
@@ -64,7 +74,10 @@ public class FileSelector extends AppCompatActivity {
         mFileView = (GridView)findViewById(R.id.gvFiles);
         mFileView.setAdapter(new FileDisplayAdapter(this, mAvailableFiles, mFileImageRessources));
 
-        mFiles = new ArrayList<String>();
+        mFilesString = new ArrayList<String>();
+        mDirectory = new File(Environment.getExternalStorageDirectory().getPath()
+                + String.format("/Android/data/?/files","com.android.exhibit"));
+        mFiles = new ArrayList<File>();
     }
 
     public void onFileSelected(View view){
@@ -73,15 +86,23 @@ public class FileSelector extends AppCompatActivity {
         if(!cb.isChecked()) {
             mToSend++;
             cb.setChecked(true);
-            mFiles.add(tv.getText().toString());
+            mFilesString.add(tv.getText().toString());
             mButtonSend.setEnabled(true);
         } else {
             mToSend--;
             cb.setChecked(false);
-            mFiles.remove(tv.getText().toString());
+            mFilesString.remove(tv.getText().toString());
             if(mToSend <= 0)
                 mButtonSend.setEnabled(false);
         }
+    }
+
+    private static void retreiveFilesFromDrive() {
+        File files[] = mDirectory.listFiles();
+        for(File file : files){
+
+        }
+
     }
 
 }

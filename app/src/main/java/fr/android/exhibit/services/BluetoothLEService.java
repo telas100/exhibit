@@ -5,7 +5,11 @@ import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import fr.android.exhibit.data.IBeacon;
+import fr.android.exhibit.model.IBeacon;
+import fr.android.exhibit.model.LiteBluetoothBeacon;
+import fr.android.exhibit.model.LiteBluetoothDevice;
+import fr.android.exhibit.model.LiteProximityRecord;
+
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -43,10 +47,18 @@ public class BluetoothLEService extends IntentService {
                             if(beacon == null && device.getName() != null
                                     && device.getType() == BluetoothDevice.DEVICE_TYPE_LE && !lookForDevice(device)) {
                                 mBluetoothDevices.add(device);
-                                Log.e("BLEDEVICE","UN BLUETOOTH LE !!!"+device.getName());
-                            } else if(beacon != null && device.getName() != null){
+                                LiteBluetoothDevice bleDevice = new LiteBluetoothDevice(device.getName(),device.getAddress());
+                                bleDevice.save();
+                                Log.e("BLEDEVICE","BLUETOOTH LE : "+device.getName()+" : "+device.getAddress());
+                            } else if(beacon != null && device.getName() != null) {
                                 mBluetoothBeacons.add(beacon);
-                                Log.e("BLEDEVICE ","UN BLUETOOTH iBEACON : "+device.getName()+" PROX : "+beacon.getProximity());
+                                LiteBluetoothBeacon beaconDevice = new LiteBluetoothBeacon(device.getName(),beacon.getBluetoothAddress(),
+                                        beacon.getProximityUuid(), beacon.getMajor(), beacon.getMinor());
+                                beaconDevice.save();
+                                LiteProximityRecord beaconRecord = new LiteProximityRecord(beaconDevice, beacon.getRssi(),
+                                        beacon.getProximity(), beacon.getAccuracy(), beacon.getTxPower());
+                                beaconRecord.save();
+                                Log.e("BLEDEVICE ", "BLUETOOTH iBEACON : " + device.getName() + " : " + beacon.getProximity());
                             }
                         }
                     });
@@ -122,7 +134,8 @@ public class BluetoothLEService extends IntentService {
 
     private boolean lookForDevice(BluetoothDevice device){
         for(BluetoothDevice bd : mBluetoothDevices){
-            if(bd.getAddress() == device.getAddress())
+            Log.e("COMPARING",bd.getAddress()+" with "+device.getAddress()+bd.getAddress().equals(device.getAddress()));
+            if (bd.getAddress().equals(device.getAddress()))
                 return true;
         }
         return false;

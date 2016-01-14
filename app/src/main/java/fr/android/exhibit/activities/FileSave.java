@@ -2,9 +2,15 @@ package fr.android.exhibit.activities;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+
+import fr.android.exhibit.model.LiteFile;
+import fr.android.exhibit.model.LiteRequest;
 import fr.android.exhibit.services.NFCForegroundUtil;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.exhibit.R;
-import fr.android.exhibit.data.SavedUserFiles;
+import fr.android.exhibit.model.SavedUserFiles;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -16,6 +22,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.activeandroid.ActiveAndroid;
 
 import fr.android.exhibit.services.BluetoothLEService;
 
@@ -30,7 +38,7 @@ import java.util.List;
 public class FileSave extends AppCompatActivity {
     NFCForegroundUtil nfcForegroundUtil = null;
     private List<BluetoothDevice> mDevices;
-    private List<String> mSelectedFiles;
+    private List<LiteFile> mSelectedFiles;
     private Button mButtonManage;
     private TextView mTextViewInfo;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -84,13 +92,13 @@ public class FileSave extends AppCompatActivity {
             String msg = new String(byt, StandardCharsets.UTF_16);
             nd.close();
             BluetoothDevice device = BluetoothLEService.matchNFC(msg);
-            if(msg.contains(MANAGER_BRACELET))
+            if (msg.contains(MANAGER_BRACELET))
                 mButtonManage.setVisibility(View.VISIBLE);
-            else if(msg.contains(RESET_STRING)) {
-                createFile();
+            else if (msg.contains(RESET_STRING)) {
+                // @TODO: clear databases
                 mTextViewInfo.setText("Données supprimées");
-            } else if(true ||device != null)
-                if(saveUser(msg))
+            } else if (true || device != null)
+                if (saveRequest(msg))
                     mTextViewInfo.setText("Informations bien enregistrées");
                 else
                     mTextViewInfo.setText("Informations non sauvegardées");
@@ -103,47 +111,9 @@ public class FileSave extends AppCompatActivity {
         }
     }
 
-    private boolean saveUser(String bluetoothName) {
-        try
-        {
-            String[] strFiles = new String[mSelectedFiles.size()];
-            mSelectedFiles.toArray(strFiles);
-            SavedUserFiles suf = new SavedUserFiles(bluetoothName,strFiles);
-            FileOutputStream filestream = null;
-            ObjectOutputStream objectstream = null;
-            filestream = openFileOutput("user_files.ser",MODE_APPEND);
-            objectstream = new ObjectOutputStream(filestream){
-                protected void writeStreamHeader() throws IOException {
-                    reset();
-                }
-            };
-            objectstream.writeObject(suf);
-            objectstream.close();
-            return true;
-        }catch(IOException i) {
-            i.printStackTrace();
-        }
-        return false;
-    }
-
-    private void createFile() {
-        deleteFile("user_files.ser");
-        FileOutputStream output = null;
-        try {
-            output = openFileOutput("user_files.ser",MODE_WORLD_READABLE);
-            ObjectOutputStream objectstream = null;
-            objectstream = new ObjectOutputStream(output);
-            SavedUserFiles header = new SavedUserFiles("BORNE "+MANAGER_BORNE,new String[]{MANAGER_BRAND, MANAGER_NAME});
-            SavedUserFiles suf = new SavedUserFiles("ID BRACELET ",new String[]{"FILES REQUIRED"});
-            objectstream.writeObject(header);
-            objectstream.writeObject(suf);
-            objectstream.reset();
-            objectstream.close();
-            output.flush();
-            output.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private boolean saveRequest(String bluetoothName) {
+        LiteFile
+        LiteRequest request = new LiteRequest(bluetoothName, )
     }
 
 

@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import fr.android.exhibit.model.LiteBluetoothBeacon;
+import fr.android.exhibit.model.LiteBluetoothDevice;
 import fr.android.exhibit.services.BluetoothLEService;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         if(true || BluetoothLEService.launchBluetoothToast(this)) {
             mBLEService = new Intent(MainActivity.this, BluetoothLEService.class);
             startService(mBLEService);
@@ -38,6 +39,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //stopService(mBLEService);
+        stopService(mBLEService);
     }
 }
