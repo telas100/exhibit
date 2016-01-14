@@ -58,6 +58,7 @@ public class BluetoothLEService extends IntentService {
         mThread = new Handler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothDevices = new ArrayList<BluetoothDevice>();
+        mBluetoothBeacons = new ArrayList<IBeacon>();
     }
 
     public BluetoothLEService(String name) {
