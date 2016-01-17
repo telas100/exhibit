@@ -11,4 +11,10 @@
     <string name="fileSelectorFileSelection">Envoyer</string>
     <string name="fileSaveMessage">Veuillez passer votre bracelet sur le lecteur NFC...</string>
     <string name="fileSaveManageMessage">Retour d\'expèrience</string>
+    <string name="table_col1">Email</string>
+    <string name="table_col2">Fichiers demandés</string>
+    <string name="roeElapsedTime">Temps écoulé</string>
+    <string name="roeRequestCount">Nombre de requêtes</string>
+    <string name="roeProximities">Nombre de proximités détectées</string>
+    <string name="roeMostRequestedFiles">Fichiers les plus demandés</string>
 </resources>

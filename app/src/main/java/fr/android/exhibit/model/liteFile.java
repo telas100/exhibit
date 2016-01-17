@@ -3,6 +3,9 @@ package fr.android.exhibit.model;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
+
+import java.util.List;
 
 /**
  * Created by Thibault on 14/01/2016.
@@ -23,6 +26,20 @@ public class LiteFile extends Model {
 
     @Override
     public String toString() {
-        return super.toString();
+        return this.getId()+":"+this.mName;
+    }
+
+    public static List<LiteFile> getByName(String filename){
+        return new Select()
+                .from(LiteFile.class)
+                .where("name == ?",filename)
+                .execute();
+    }
+
+    public static List<LiteFile> getAll() {
+        return new Select()
+                .all()
+                .from(LiteFile.class)
+                .execute();
     }
 }

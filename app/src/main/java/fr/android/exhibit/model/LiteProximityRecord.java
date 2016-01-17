@@ -7,7 +7,7 @@ import com.activeandroid.annotation.Table;
 /**
  * Created by Thibault on 14/01/2016.
  */
-@Table(name = "ProximityRecords")
+@Table(name = "Records")
 public class LiteProximityRecord extends Model {
     @Column(name = "id_beacon")
     public LiteBluetoothBeacon mBeacon;

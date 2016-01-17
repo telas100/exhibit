@@ -3,7 +3,10 @@ package fr.android.exhibit.activities;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 
+import fr.android.exhibit.model.LiteBluetoothBeacon;
+import fr.android.exhibit.model.LiteBluetoothDevice;
 import fr.android.exhibit.model.LiteFile;
+import fr.android.exhibit.model.LiteProximityRecord;
 import fr.android.exhibit.model.LiteRequest;
 import fr.android.exhibit.services.NFCForegroundUtil;
 
@@ -19,14 +22,17 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 
 import fr.android.exhibit.services.BluetoothLEService;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -34,11 +40,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileSave extends AppCompatActivity {
     NFCForegroundUtil nfcForegroundUtil = null;
     private List<BluetoothDevice> mDevices;
-    private List<LiteFile> mSelectedFiles;
+    private List<String> mSelectedFiles;
     private Button mButtonManage;
     private TextView mTextViewInfo;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -83,7 +91,6 @@ public class FileSave extends AppCompatActivity {
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Ndef nd = Ndef.get(tag);
         try {
-            mDevices = BluetoothLEService.getBluetoothDevices();
             nd.connect();
             NdefMessage ndfm = nd.getNdefMessage();
             NdefRecord ndr = ndfm.getRecords()[0];
@@ -91,19 +98,26 @@ public class FileSave extends AppCompatActivity {
             byte[] byt = ndr.getPayload();
             String msg = new String(byt, StandardCharsets.UTF_16);
             nd.close();
-            BluetoothDevice device = BluetoothLEService.matchNFC(msg);
             if (msg.contains(MANAGER_BRACELET))
                 mButtonManage.setVisibility(View.VISIBLE);
             else if (msg.contains(RESET_STRING)) {
-                // @TODO: clear databases
-                mTextViewInfo.setText("Données supprimées");
-            } else if (true || device != null)
-                if (saveRequest(msg))
-                    mTextViewInfo.setText("Informations bien enregistrées");
-                else
-                    mTextViewInfo.setText("Informations non sauvegardées");
-            else
-                mTextViewInfo.setText("Périphérique Bluetooth LE introuvable");
+                this.resetDatabase();
+                mTextViewInfo.setText("Données supprimées, veuillez relancer l'application.");
+            } else {
+                Pattern pat = Pattern.compile("([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})");
+                Matcher mat = pat.matcher(msg);
+                if (mat.find()) {
+                    msg = mat.group();
+                    LiteBluetoothDevice device = BluetoothLEService.matchNFC(msg);
+                    if (device != null) {
+                        saveRequest(device.mAddress);
+                        mTextViewInfo.setText("Informations bien enregistrées");
+                    } else
+                        mTextViewInfo.setText("Périphérique Bluetooth introuvable");
+                } else
+                    mTextViewInfo.setText("Erreur dans le paramétrage de la puce NFC");
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (FormatException e) {
@@ -111,9 +125,20 @@ public class FileSave extends AppCompatActivity {
         }
     }
 
-    private boolean saveRequest(String bluetoothName) {
-        LiteFile
-        LiteRequest request = new LiteRequest(bluetoothName, )
+    private void saveRequest(String bluetoothName) {
+        for(String filename : mSelectedFiles) {
+            LiteFile lf = LiteFile.getByName(filename).get(0);
+            LiteRequest lr = new LiteRequest(bluetoothName, lf);
+            lr.save();
+        }
+    }
+
+    private static void resetDatabase() {
+        new Delete().from(LiteRequest.class).execute();
+        new Delete().from(LiteProximityRecord.class).execute();
+        new Delete().from(LiteBluetoothBeacon.class).execute();
+        new Delete().from(LiteBluetoothDevice.class).execute();
+        new Delete().from(LiteFile.class).execute();
     }
 
 

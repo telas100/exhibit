@@ -13,6 +13,7 @@ import fr.android.exhibit.services.BluetoothLEService;
 public class MainActivity extends AppCompatActivity {
     private View mView;
     private Intent mBLEService = null;
+    public static final long START_TIME = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

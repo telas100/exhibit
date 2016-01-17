@@ -33,8 +33,6 @@ public class BluetoothLEService extends IntentService {
      */
 
     private Handler mThread;
-    private static List<BluetoothDevice> mBluetoothDevices;
-    private static List<IBeacon> mBluetoothBeacons;
     private static BluetoothAdapter mAdapter;
     private final BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
@@ -46,12 +44,10 @@ public class BluetoothLEService extends IntentService {
                             IBeacon beacon = IBeacon.fromScanData(scanRecord,rssi,device);
                             if(beacon == null && device.getName() != null
                                     && device.getType() == BluetoothDevice.DEVICE_TYPE_LE && !lookForDevice(device)) {
-                                mBluetoothDevices.add(device);
                                 LiteBluetoothDevice bleDevice = new LiteBluetoothDevice(device.getName(),device.getAddress());
                                 bleDevice.save();
                                 Log.e("BLEDEVICE","BLUETOOTH LE : "+device.getName()+" : "+device.getAddress());
                             } else if(beacon != null && device.getName() != null) {
-                                mBluetoothBeacons.add(beacon);
                                 LiteBluetoothBeacon beaconDevice = new LiteBluetoothBeacon(device.getName(),beacon.getBluetoothAddress(),
                                         beacon.getProximityUuid(), beacon.getMajor(), beacon.getMinor());
                                 beaconDevice.save();
@@ -69,15 +65,12 @@ public class BluetoothLEService extends IntentService {
         super(".BluetoothLEService");
         mThread = new Handler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothDevices = new ArrayList<BluetoothDevice>();
-        mBluetoothBeacons = new ArrayList<IBeacon>();
     }
 
     public BluetoothLEService(String name) {
         super(name);
         mThread = new Handler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothDevices = new ArrayList<BluetoothDevice>();
     }
 
     public static boolean launchBluetoothToast(Activity context) {
@@ -97,13 +90,11 @@ public class BluetoothLEService extends IntentService {
         }
     }
 
-    public static List<BluetoothDevice> getBluetoothDevices() {
-        return mBluetoothDevices;
+    public static List<LiteBluetoothDevice> getBluetoothDevices() {
+        return LiteBluetoothDevice.getAll();
     }
 
-    public static List<IBeacon> getBluetoothBeacons() {
-        return mBluetoothBeacons;
-    }
+    // public static List<IBeacon> getBluetoothBeacons() { return mBluetoothBeacons; }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -133,9 +124,9 @@ public class BluetoothLEService extends IntentService {
     }
 
     private boolean lookForDevice(BluetoothDevice device){
-        for(BluetoothDevice bd : mBluetoothDevices){
-            Log.e("COMPARING",bd.getAddress()+" with "+device.getAddress()+bd.getAddress().equals(device.getAddress()));
-            if (bd.getAddress().equals(device.getAddress()))
+        for(LiteBluetoothDevice bd : LiteBluetoothDevice.getAll()){
+            Log.e("COMPARING", bd.mAddress + " with " + device.getAddress() + bd.mAddress.equals(device.getAddress()));
+            if (bd.mAddress.equals(device.getAddress()))
                 return true;
         }
         return false;
@@ -147,11 +138,11 @@ public class BluetoothLEService extends IntentService {
         Log.e("BLESERVICE_CLASS","Service ended.");
     }
 
-    public static BluetoothDevice matchNFC(String nfcContent) {
-        List<BluetoothDevice> tempBluetoothDevices = getBluetoothDevices();
-        if(tempBluetoothDevices!= null && !tempBluetoothDevices.isEmpty()) {
-            for(BluetoothDevice bd : tempBluetoothDevices) {
-                if(bd.getName().equals(nfcContent))
+    public static LiteBluetoothDevice matchNFC(String nfcContent) {
+        List<LiteBluetoothDevice> devices = LiteBluetoothDevice.getAll();
+        if(devices!= null && !devices.isEmpty()) {
+            for(LiteBluetoothDevice bd : devices) {
+                if(bd.mAddress.equals(nfcContent))
                     return bd;
             }
             return null;

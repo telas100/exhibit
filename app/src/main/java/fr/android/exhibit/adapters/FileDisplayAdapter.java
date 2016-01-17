@@ -11,6 +11,10 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Thibault on 07/01/2016.
  */
@@ -24,6 +28,15 @@ public class FileDisplayAdapter extends BaseAdapter {
         mContext = context;
         mTitles = titles;
         mRessources = ressources;
+    }
+    public FileDisplayAdapter(Context context,List<File> files, Integer[] ressources) {
+        mContext = context;
+        mTitles = new String[files.size()];
+        mRessources = ressources;
+        List<String> titles = new ArrayList<String>();
+        for(File file : files)
+            titles.add(file.getName());
+        titles.toArray(mTitles);
     }
 
     public int getCount() {

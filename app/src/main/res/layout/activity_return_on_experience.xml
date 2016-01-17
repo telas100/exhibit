@@ -1,17 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:textAlignment="center"
+            android:stretchColumns="1"
+            android:paddingLeft="20sp"
+            android:id="@+id/tbStatistics"
+            android:layout_alignParentStart="false">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/tvReturnOnExperience"
-        android:minHeight="100sp"
-        android:minWidth="100sp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/roeElapsedTime"
+                    android:id="@+id/textView2"
+                    android:layout_column="0"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Text"
+                    android:id="@+id/tvElapsedTime"
+                    android:layout_column="1"
+                    android:textAlignment="center" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/roeRequestCount"
+                    android:id="@+id/textView3"
+                    android:layout_column="0"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Text"
+                    android:id="@+id/tvRequestCount"
+                    android:layout_column="1"
+                    android:textAlignment="center" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/roeProximities"
+                    android:id="@+id/textView4"
+                    android:layout_column="0"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Text"
+                    android:id="@+id/tvProximities"
+                    android:layout_column="1"
+                    android:textAlignment="center" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/roeMostRequestedFiles"
+                    android:id="@+id/textView6"
+                    android:layout_column="0"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Text"
+                    android:id="@+id/tvMostRequestedFiles"
+                    android:layout_column="1"
+                    android:textAlignment="center" />
+            </TableRow>
+        </TableLayout>
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentStart="false"
+            android:stretchColumns="1"
+            android:id="@+id/tbEmailFiles"
+            android:layout_below="@id/tbStatistics"
+            android:layout_marginTop="50sp">
+
+            <TableRow
+                android:layout_marginEnd="198dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="@string/table_col1"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_width="wrap_content" />
+                <TextView
+                    android:text="@string/table_col2"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent" />
+            </TableRow>
+        </TableLayout>
+
+    </RelativeLayout>
+</ScrollView>
