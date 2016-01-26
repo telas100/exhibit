@@ -4,35 +4,45 @@ import android.app.Activity;
 import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
-import fr.android.exhibit.model.IBeacon;
-import fr.android.exhibit.model.LiteBluetoothBeacon;
-import fr.android.exhibit.model.LiteBluetoothDevice;
-import fr.android.exhibit.model.LiteProximityRecord;
-
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static java.lang.Thread.sleep;
+import fr.android.exhibit.activities.MainActivity;
+import fr.android.exhibit.entities.IBeacon;
+import fr.android.exhibit.entities.LiteBeacon;
+import fr.android.exhibit.entities.LiteDevice;
+import fr.android.exhibit.entities.LiteRecord;
 
 /**
  * Created by Thibault on 08/01/2016.
  */
 public class BluetoothLEService extends IntentService {
     private static final long LESCAN_DURATION = 2000;
-    private static final long LESCAN_NUMBER = 2;
-    private static final long LESCAN_SWITCH = 2000;
+    private static final long RUNS_BEFORE_EMPTY_MESSAGE = 5;
+    public static final String EXTRA_BEACON_NAME = "beacon_name";
+    private static int count = 0;
+
     /*
     MAC ADRESSES
     D0:39:72:C8:C7:00 - IBEACON Bean - BLE Bean270
     B4:99:4C:1E:BC:07
      */
-
+;
+    private boolean mInterrupted = false;
     private Handler mThread;
+    private static final String EMPTY_BEAN = "BeanVoid"; // name when no data
+    private LocalBroadcastManager mBroadcastManager;
+    private IBeacon mClosestBeacon;
+    private LiteDevice mClosestDevice;
     private static BluetoothAdapter mAdapter;
     private final BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
@@ -41,80 +51,99 @@ public class BluetoothLEService extends IntentService {
                     runOnThread(new Runnable() {
                         @Override
                         public void run() {
-                            IBeacon beacon = IBeacon.fromScanData(scanRecord,rssi,device);
-                            if(beacon == null && device.getName() != null
-                                    && device.getType() == BluetoothDevice.DEVICE_TYPE_LE && !lookForDevice(device)) {
-                                LiteBluetoothDevice bleDevice = new LiteBluetoothDevice(device.getName(),device.getAddress());
-                                bleDevice.save();
-                                Log.e("BLEDEVICE","BLUETOOTH LE : "+device.getName()+" : "+device.getAddress());
-                            } else if(beacon != null && device.getName() != null) {
-                                LiteBluetoothBeacon beaconDevice = new LiteBluetoothBeacon(device.getName(),beacon.getBluetoothAddress(),
-                                        beacon.getProximityUuid(), beacon.getMajor(), beacon.getMinor());
-                                beaconDevice.save();
-                                LiteProximityRecord beaconRecord = new LiteProximityRecord(beaconDevice, beacon.getRssi(),
+                            IBeacon beacon = IBeacon.fromScanData(scanRecord, rssi, device);
+                            if(device.getName() != null)
+                                Log.e("BLESERVICE DEVICE","FOUND ! "+device.getName());
+                            if(device.getName()!= null && beacon != null)
+                                Log.e("BLESERVICE BEACON","ACCURACY "+beacon.getAccuracy());
+                            if (isLightBlueBean(device)&& beacon == null && device.getName() != null) { // #1 - If the device is running on normal BLE mode
+                                Pattern pat = Pattern.compile("[0-4]{1}[:]");
+                                Matcher mat = pat.matcher(device.getName());
+                                if (mat.find()) {
+                                    List<LiteDevice> bleDevices = LiteDevice.getByAddress(device.getAddress());
+                                    LiteDevice bleDevice = null;
+                                    if (bleDevices.size() > 0) // #1.1 - The device exists within the database
+                                        bleDevice = bleDevices.get(0);
+                                    else // #1.2 - The device is new
+                                        bleDevice = new LiteDevice(device.getAddress());
+                                    if (!bleDevice.isFullyRegistered()) { // #1.3 - The device lacks some parameters
+                                        String[] split = device.getName().split(":", 2);
+                                        bleDevice.addParameter(split[0].charAt(0), split[1]);
+                                        bleDevice.save();
+                                    }
+                                }
+                            } else if (beacon != null && device.getName() != null) { // #2 - If the device is running on beacon mod
+                                List<LiteBeacon> bleBeacons = LiteBeacon.getByAddress(device.getAddress());
+                                LiteBeacon bleBeacon = null;
+                                if (bleBeacons.size() > 0) // #2.1 - The beacon exists within the database
+                                    bleBeacon = bleBeacons.get(0);
+                                else { // #2.2 - The beacon is new
+                                    bleBeacon = new LiteBeacon(device.getName(), device.getAddress()
+                                            , beacon.getProximityUuid(), beacon.getMajor(), beacon.getMinor());
+                                    bleBeacon.save();
+                                }
+                                LiteRecord bleRecord = new LiteRecord(bleBeacon, beacon.getRssi(),
                                         beacon.getProximity(), beacon.getAccuracy(), beacon.getTxPower());
-                                beaconRecord.save();
-                                Log.e("BLEDEVICE ", "BLUETOOTH iBEACON : " + device.getName() + " : " + beacon.getProximity());
+                                bleRecord.save();
+                                if (mClosestBeacon == null || beacon.getAccuracy() < mClosestBeacon.getAccuracy()) {
+                                    List<LiteDevice> bleDevices = LiteDevice.getByAddress(device.getAddress());
+                                    if (bleDevices.size() > 0
+                                            && bleDevices.get(0).isFullyRegistered()) {
+                                        mClosestDevice = bleDevices.get(0);
+                                        mClosestBeacon = beacon;
+                                        count = 0;
+                                    }
+                                }
                             }
                         }
                     });
                 }
             };
 
-    public BluetoothLEService() {
-        super(".BluetoothLEService");
-        mThread = new Handler();
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-    }
-
-    public BluetoothLEService(String name) {
-        super(name);
-        mThread = new Handler();
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-    }
-
-    public static boolean launchBluetoothToast(Activity context) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mAdapter == null) {
-            Toast.makeText(context, "Ce périphérique ne permet pas l'utilisation du Bluetooth.", Toast.LENGTH_LONG).show();
-            return false;
-        } else {
-            if (!mAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                context.startActivityForResult(enableBtIntent, 100);
+    private boolean isLightBlueBean(BluetoothDevice device) {
+        if (device.getType() == BluetoothDevice.DEVICE_TYPE_LE)
+            if (!LiteBeacon.getByAddress(device.getAddress()).isEmpty())
                 return true;
-            } else {
-                Toast.makeText(context, "La fonction Bluetooth n'a pu être activée.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-        }
+        return false;
     }
 
-    public static List<LiteBluetoothDevice> getBluetoothDevices() {
-        return LiteBluetoothDevice.getAll();
+    public BluetoothLEService() {
+        super("BluetoothLEService");
+        mThread = new Handler();
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBroadcastManager = LocalBroadcastManager.getInstance(this);
     }
-
-    // public static List<IBeacon> getBluetoothBeacons() { return mBluetoothBeacons; }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // @TODO: 14/01/2016 Si nécessaire, threader le startlescan/stoplescan et en lancer
-        // @TODO:             plusieurs à Xsec d'intervalle sur une longue durée
-
         int i = 1;
-        while(true) {
+        mInterrupted = false;
+        mClosestDevice = null;
+        while(!mInterrupted) {
             try {
                 synchronized (this) {
-                    Log.e("LESCAN","RUNNING LESCAN N"+String.valueOf(i));
+                    Log.e("LESCAN", "RUNNING LESCAN N" + String.valueOf(i));
+                    mClosestBeacon = null;
                     mAdapter.startLeScan(null, mLeScanCallback);
                     wait(LESCAN_DURATION);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                Log.e("LESCAN","ENDING LESCAN N"+String.valueOf(i));
+                Log.e("LESCAN", "ENDING LESCAN N" + String.valueOf(i));
                 i++;
                 mAdapter.stopLeScan(mLeScanCallback);
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction(BluetoothLEReceiver.ACTION_BEACON_DISCOVERED);
+                if(mClosestDevice != null)
+                    broadcastIntent.putExtra(EXTRA_BEACON_NAME, mClosestDevice.getFullName());
+                else
+                    broadcastIntent.putExtra(EXTRA_BEACON_NAME, "");
+                mBroadcastManager.sendBroadcast(broadcastIntent);
+                if(count >= RUNS_BEFORE_EMPTY_MESSAGE)
+                    mClosestDevice = null;
+                else
+                    count++;
             }
         }
     }
@@ -123,31 +152,11 @@ public class BluetoothLEService extends IntentService {
         mThread.post(runnable);
     }
 
-    private boolean lookForDevice(BluetoothDevice device){
-        for(LiteBluetoothDevice bd : LiteBluetoothDevice.getAll()){
-            Log.e("COMPARING", bd.mAddress + " with " + device.getAddress() + bd.mAddress.equals(device.getAddress()));
-            if (bd.mAddress.equals(device.getAddress()))
-                return true;
-        }
-        return false;
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("BLESERVICE_CLASS","Service ended.");
-    }
-
-    public static LiteBluetoothDevice matchNFC(String nfcContent) {
-        List<LiteBluetoothDevice> devices = LiteBluetoothDevice.getAll();
-        if(devices!= null && !devices.isEmpty()) {
-            for(LiteBluetoothDevice bd : devices) {
-                if(bd.mAddress.equals(nfcContent))
-                    return bd;
-            }
-            return null;
-        }
-        else
-            return null;
+        mInterrupted = true;
+        mAdapter.stopLeScan(mLeScanCallback);
+        Log.e("BLESERVICE_CLASS", "Service ended.");
     }
 }

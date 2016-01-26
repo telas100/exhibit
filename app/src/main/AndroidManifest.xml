@@ -1,57 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="android.exhibit">
+    package="fr.android.exhibit.activities">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo_bubble"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <meta-data android:name="AA_DB_NAME" android:value="Exhibit.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="1" />
+        android:theme="@style/WelcomeActivityTheme">
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="Exhibit.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="2" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="fr.android.exhibit.model.LiteBluetoothDevice,
-                           fr.android.exhibit.model.LiteBluetoothBeacon,
-                           fr.android.exhibit.model.LiteProximityRecord,
-                           fr.android.exhibit.model.LiteRequest,
-                           fr.android.exhibit.model.LiteFile" />
+            android:value="fr.android.exhibit.model.LiteDevice,fr.android.exhibit.model.LiteBeacon,                            fr.android.exhibit.model.LiteRecord,                            fr.android.exhibit.model.LiteRequest,                            fr.android.exhibit.model.LiteFile" />
 
         <activity
-            android:name="fr.android.exhibit.activities.MainActivity"
-            android:configChanges="screenSize"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme">
+            android:name=".MainActivity"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="fr.android.exhibit.activities.FileSelector"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme" />
-        <activity
-            android:name="fr.android.exhibit.activities.FileSave"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme" />
-        <activity
-            android:name="fr.android.exhibit.activities.ReturnOnExperience"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme"/>
 
         <service
             android:name="fr.android.exhibit.services.BluetoothLEService"
             android:exported="false" />
+
+        <activity
+            android:name=".FilePicker"
+            android:label="@string/title_activity_file_picker"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/ExhibitTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.android.exhibit.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".NfcPrompter"
+            android:label="@string/title_activity_nfc_prompter"
+            android:parentActivityName=".FilePicker"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/ExhibitTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.android.exhibit.activities.FilePicker" />
+        </activity>
+        <activity
+            android:name=".ManagerReport"
+            android:label="@string/title_activity_manager_report"
+            android:parentActivityName=".FilePicker"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/ExhibitTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.android.exhibit.activities.FilePicker" />
+        </activity>
     </application>
 
 </manifest>

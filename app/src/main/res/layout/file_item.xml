@@ -1,29 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="120sp"
-    android:layout_height="120sp"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="140sp"
+    android:layout_height="140sp"
     android:padding="10sp"
     android:orientation="vertical"
-    android:id="@+id/fileLayout"
+    android:id="@+id/fi_ll_layout"
     android:onClick="onFileSelected">
 
-    <TextView
-        android:id="@+id/tvFileTitle"
-        android:layout_width="fill_parent"
-        android:layout_height="20sp" />
+    <android.support.v7.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fi_cv_card">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="5sp">
 
-    <ImageView
-        android:id="@+id/ivFileImage"
-        android:layout_width="fill_parent"
-        android:layout_height="60sp"
-        android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp" />
+            <TextView
+                android:id="@+id/fi_tv_name"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="20sp"
+                android:scrollHorizontally="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"/>
 
-    <CheckBox
-        android:id="@+id/cbFileSend"
-        android:layout_width="fill_parent"
-        android:layout_height="20sp"
-        android:text="@string/fileSelectorFileSelection"
-        android:textSize="15sp"/>
+            <ImageView
+                android:id="@+id/fi_iv_image"
+                android:layout_width="60sp"
+                android:layout_height="60sp"
+                android:layout_marginLeft="22sp"
+                android:contentDescription="@string/fi_file_description" />
+
+            <CheckBox
+                android:id="@+id/fi_cb_select"
+                android:layout_width="100sp"
+                android:text="@string/fi_checkbox_text"
+                android:textSize="10sp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
 
 </LinearLayout>

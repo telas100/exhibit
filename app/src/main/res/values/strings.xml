@@ -1,20 +1,13 @@
 <resources>
-    <string name="app_name">Exhibit</string>
-
-    <string name="society.default">Tipstr</string>
-    <string name="society">Decathlon</string>
-    <string name="welcomeMessage">Bienvenue sur la borne de l\'entreprise</string>
-    <string name="welcomeText">Touchez pour continuer</string>
-    <string name="fileSelectorMessage">Fichiers disponibles</string>
-    <string name="fileSelectorButtonSendText">Envoyer à mon addresse email</string>
-    <string name="fileSelectorButtonReturnText">Retour</string>
-    <string name="fileSelectorFileSelection">Envoyer</string>
-    <string name="fileSaveMessage">Veuillez passer votre bracelet sur le lecteur NFC...</string>
-    <string name="fileSaveManageMessage">Retour d\'expèrience</string>
-    <string name="table_col1">Email</string>
-    <string name="table_col2">Fichiers demandés</string>
-    <string name="roeElapsedTime">Temps écoulé</string>
-    <string name="roeRequestCount">Nombre de requêtes</string>
-    <string name="roeProximities">Nombre de proximités détectées</string>
-    <string name="roeMostRequestedFiles">Fichiers les plus demandés</string>
+    <string name="app_name">Tipsy Exposant</string>
+    <string name="ma_welcome">Bonjour et bienvenue au salon de l\'Etudiant 2016</string>
+    <string name="ma_continue">Veuillez cliquer pour continuer</string>
+    <string name="sample_name"></string>
+    <string name="title_activity_file_picker">Sélectionner les fichiers à envoyer</string>
+    <string name="fi_checkbox_text">Sélectionner</string>
+    <string name="fi_file_description">Type de fichier</string>
+    <string name="nfcp_prompt">Veuillez passer votre bracelet sur la borne NFC</string>
+    <string name="nfcp_manager">Accéder à l\'interface manager</string>
+    <string name="title_activity_nfc_prompter">Vérification NFC</string>
+    <string name="title_activity_manager_report">Rapport Manager</string>
 </resources>
