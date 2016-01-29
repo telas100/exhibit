@@ -317,7 +317,7 @@ public class IBeacon {
         if (accuracy < 0) {
             return PROXIMITY_UNKNOWN;
         }
-        if (accuracy < 4 ) {
+        if (accuracy < 2 ) {
             return IBeacon.PROXIMITY_IMMEDIATE;
         }
         if (accuracy <= 4.0) {

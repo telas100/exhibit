@@ -1,22 +1,17 @@
 package fr.android.exhibit.services;
 
-import android.app.Activity;
 import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import fr.android.exhibit.activities.MainActivity;
 import fr.android.exhibit.entities.IBeacon;
 import fr.android.exhibit.entities.LiteBeacon;
 import fr.android.exhibit.entities.LiteDevice;
@@ -29,6 +24,9 @@ public class BluetoothLEService extends IntentService {
     private static final long LESCAN_DURATION = 2000;
     private static final long RUNS_BEFORE_EMPTY_MESSAGE = 5;
     public static final String EXTRA_BEACON_NAME = "beacon_name";
+    private static final String LIGHTBLUEBEAN_UUID = "";
+    private static final int LIGHTBLUEBEAN_MAJOR = 0;
+    private static final int LIGHTBLUEBEAN_MINOR = 0;
     private static int count = 0;
 
     /*
@@ -56,7 +54,9 @@ public class BluetoothLEService extends IntentService {
                                 Log.e("BLESERVICE DEVICE","FOUND ! "+device.getName());
                             if(device.getName()!= null && beacon != null)
                                 Log.e("BLESERVICE BEACON","ACCURACY "+beacon.getAccuracy());
-                            if (isLightBlueBean(device)&& beacon == null && device.getName() != null) { // #1 - If the device is running on normal BLE mode
+                            if (beacon == null && device.getName() != null
+                                    && device.getName() != EMPTY_BEAN
+                                    && isLightBlueBeanBluetooth(device)) { // #1 - If the device is running on normal BLE mode
                                 Pattern pat = Pattern.compile("[0-4]{1}[:]");
                                 Matcher mat = pat.matcher(device.getName());
                                 if (mat.find()) {
@@ -72,7 +72,9 @@ public class BluetoothLEService extends IntentService {
                                         bleDevice.save();
                                     }
                                 }
-                            } else if (beacon != null && device.getName() != null) { // #2 - If the device is running on beacon mod
+                            } else if (beacon != null && device.getName() != null
+                                    && device.getName() != EMPTY_BEAN
+                                    && isLightBlueBeanBeacon(beacon)) { // #2 - If the device is running on beacon mod
                                 List<LiteBeacon> bleBeacons = LiteBeacon.getByAddress(device.getAddress());
                                 LiteBeacon bleBeacon = null;
                                 if (bleBeacons.size() > 0) // #2.1 - The beacon exists within the database
@@ -100,10 +102,18 @@ public class BluetoothLEService extends IntentService {
                 }
             };
 
-    private boolean isLightBlueBean(BluetoothDevice device) {
+    private boolean isLightBlueBeanBluetooth(BluetoothDevice device) {
         if (device.getType() == BluetoothDevice.DEVICE_TYPE_LE)
             if (!LiteBeacon.getByAddress(device.getAddress()).isEmpty())
                 return true;
+        return false;
+    }
+
+    private boolean isLightBlueBeanBeacon(IBeacon beacon) {
+        if (beacon.getProximityUuid() == LIGHTBLUEBEAN_UUID
+                && beacon.getMajor() == LIGHTBLUEBEAN_MAJOR
+                && beacon.getMinor() == LIGHTBLUEBEAN_MINOR)
+            return true;
         return false;
     }
 

@@ -11,6 +11,7 @@ import com.activeandroid.query.Select;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Thibault on 14/01/2016.
@@ -68,7 +69,7 @@ public class LiteRecord extends Model {
         return map;
     }
 
-    public static List<LiteRequest> getAll() {
+    public static List<LiteRecord> getAll() {
         return new Select()
                 .all()
                 .from(LiteRecord.class)
@@ -78,6 +79,22 @@ public class LiteRecord extends Model {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    public static TreeMap<Integer,Integer> getProximityMatrix() {
+        List<LiteRecord> records = getAll();
+        TreeMap<Integer,Integer> map = new TreeMap<Integer, Integer>();
+        for (LiteRecord lr : records) {
+            int acc = (int)lr.mAccuracy;
+            if(!map.containsKey(acc)) {
+                map.put(acc,1);
+            } else {
+                int value = map.get(acc);
+                map.remove(acc);
+                map.put(acc,value+1);
+            }
+        }
+        return map;
     }
 
 }

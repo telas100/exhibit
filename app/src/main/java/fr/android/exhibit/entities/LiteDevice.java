@@ -11,9 +11,11 @@ import com.activeandroid.query.Select;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by Thibault on 14/01/2016.
@@ -119,12 +121,18 @@ public class LiteDevice extends Model {
                 .execute();
     }
 
-    public static HashMap<Integer,Integer> getCountByAge() {
-        HashMap<Integer,Integer> map = new HashMap<Integer, Integer>();
+    public static TreeMap<Integer,Integer> getCountByAge() {
+        Integer currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        TreeMap<Integer,Integer> map = new TreeMap<Integer, Integer>();
         List<LiteDevice> allList = getAll();
         for(LiteDevice ld : allList) {
-            if(map.containsKey(ld.mDateOfBirth.getYear())) {
-
+            Integer age = currentYear - ld.mDateOfBirth.getYear() - 1900;
+            if(!map.containsKey(age)) {
+                map.put(age,1);
+            } else {
+                int value = map.get(age);
+                map.remove(age);
+                map.put(age,value+1);
             }
         }
         return map;
