@@ -1,9 +1,7 @@
 package fr.android.exhibit.entities;
 
-import android.database.Cursor;
 import android.util.Log;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -13,7 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -63,43 +60,6 @@ public class LiteDevice extends Model {
         this.mAddress = mAddress;
     }
 
-    public void addParameter(Character index, String value) {
-        switch(index) {
-            case '0':
-                if(mGender == null || mDateOfBirth == null)
-                    this.setGDOB(value);
-                break;
-            case '1':
-                if(mFirstName == null)
-                    mFirstName = value;
-                break;
-            case '2':
-                if(mName == null)
-                    mName = value;
-                break;
-            case '3':
-                if(mEmail == null)
-                    mEmail = value;
-                break;
-            case '4':
-                if(mSociety == null)
-                    mSociety = value;
-                break;
-            default:
-                Log.e("LITEDEVICE.CLASS", "WRONG INDEX");
-        }
-    }
-
-    private void setGDOB(String value) {
-        String[] split = value.split(":",2);
-        try {
-            mGender = Character.toUpperCase(split[0].charAt(0));
-            mDateOfBirth = new SimpleDateFormat("ddMMyyyy").parse(split[1]);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static List<LiteDevice> getByName(String name) {
         return new Select()
                 .from(LiteDevice.class)
@@ -121,43 +81,78 @@ public class LiteDevice extends Model {
                 .execute();
     }
 
-    public static TreeMap<Integer,Integer> getCountByAge() {
+    public static TreeMap<Integer, Integer> getCountByAge() {
         Integer currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        TreeMap<Integer,Integer> map = new TreeMap<Integer, Integer>();
+        TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
         List<LiteDevice> allList = getAll();
-        for(LiteDevice ld : allList) {
+        for (LiteDevice ld : allList) {
             Integer age = currentYear - ld.mDateOfBirth.getYear() - 1900;
-            if(!map.containsKey(age)) {
-                map.put(age,1);
+            if (!map.containsKey(age)) {
+                map.put(age, 1);
             } else {
                 int value = map.get(age);
                 map.remove(age);
-                map.put(age,value+1);
+                map.put(age, value + 1);
             }
         }
         return map;
     }
 
+    public void addParameter(Character index, String value) {
+        switch (index) {
+            case '0':
+                if (mGender == null || mDateOfBirth == null)
+                    this.setGDOB(value);
+                break;
+            case '1':
+                if (mFirstName == null)
+                    mFirstName = value;
+                break;
+            case '2':
+                if (mName == null)
+                    mName = value;
+                break;
+            case '3':
+                if (mEmail == null)
+                    mEmail = value;
+                break;
+            case '4':
+                if (mSociety == null)
+                    mSociety = value;
+                break;
+            default:
+                Log.e("LITEDEVICE.CLASS", "WRONG INDEX");
+        }
+    }
+
+    private void setGDOB(String value) {
+        String[] split = value.split(":", 2);
+        try {
+            mGender = Character.toUpperCase(split[0].charAt(0));
+            mDateOfBirth = new SimpleDateFormat("ddMMyyyy").parse(split[1]);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String toString() {
-        return this.getId()+":"+this.mName+":"+this.mAddress;
+        return this.getId() + ":" + this.mName + ":" + this.mAddress;
     }
 
     public boolean isFullyRegistered() {
-        if(mGender == null
+        return !(mGender == null
                 || mDateOfBirth == null
                 || mName == null
                 || mFirstName == null
                 || mEmail == null
-                || mSociety == null)
-            return false;
-        return true;
+                || mSociety == null);
     }
 
     public String getFullName() {
         StringBuilder sb = new StringBuilder();
-        sb.append((mGender == 'F') ? "Mme. " : "M. " );
-        sb.append(mName+" ");
+        sb.append((mGender == 'F') ? "Mme. " : "M. ");
+        sb.append(mName + " ");
         sb.append(mFirstName);
         return sb.toString();
     }

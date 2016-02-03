@@ -2,26 +2,17 @@ package fr.android.exhibit.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
-import android.support.annotation.UiThread;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
-
-import java.io.File;
 
 import fr.android.exhibit.services.BluetoothLEReceiver;
 import fr.android.exhibit.services.BluetoothLEService;

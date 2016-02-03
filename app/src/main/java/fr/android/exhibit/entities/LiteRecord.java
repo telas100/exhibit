@@ -33,10 +33,16 @@ public class LiteRecord extends Model {
     @Column(name = "tx_power")
     public int mTxPower;
 
+    /*
+     * Default constructor.
+     */
     public LiteRecord() {
         super();
     }
 
+    /*
+     * Constructor setting all parameters.
+     */
     public LiteRecord(LiteBeacon beacon, int rssi, int proximity, double accuracy, int txPower) {
         super();
         this.mBeacon = beacon;
@@ -69,6 +75,9 @@ public class LiteRecord extends Model {
         return map;
     }
 
+    /*
+     * Retrieve all LiteRecord
+     */
     public static List<LiteRecord> getAll() {
         return new Select()
                 .all()
@@ -81,6 +90,9 @@ public class LiteRecord extends Model {
         return super.toString();
     }
 
+    /*
+     * Return the Matrix Map<Beacon Accuracy, Index++>
+     */
     public static TreeMap<Integer,Integer> getProximityMatrix() {
         List<LiteRecord> records = getAll();
         TreeMap<Integer,Integer> map = new TreeMap<Integer, Integer>();

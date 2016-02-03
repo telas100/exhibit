@@ -22,7 +22,11 @@
             android:value="2" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="fr.android.exhibit.model.LiteDevice,fr.android.exhibit.model.LiteBeacon,                            fr.android.exhibit.model.LiteRecord,                            fr.android.exhibit.model.LiteRequest,                            fr.android.exhibit.model.LiteFile" />
+            android:value="fr.android.exhibit.entities.LiteDevice,
+                            fr.android.exhibit.entities.LiteBeacon,
+                            fr.android.exhibit.entities.LiteRecord,
+                            fr.android.exhibit.entities.LiteRequest,
+                            fr.android.exhibit.entities.LiteFile" />
 
         <activity
             android:name=".MainActivity"

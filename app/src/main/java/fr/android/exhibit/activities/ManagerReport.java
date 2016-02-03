@@ -1,7 +1,7 @@
 package fr.android.exhibit.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -17,11 +17,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -34,19 +31,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class ManagerReport extends AppCompatActivity {
-    private static final String LIGHTNING_PUBLIC_SESSION_URL = "http://public.lightning-viz.org/sessions/bc8c34f9-31cc-480a-95b9-69b361d9dacf/visualizations";
+    private static final String LIGHTNING_PUBLIC_SESSION_URL
+            = "http://public.lightning-viz.org/sessions/7672f5b5-68d2-4a82-9af7-73e7f7f67527/visualizations";
     private BarChart chart;
 
-    private final static LinkedHashMap<String,Integer> STATIC_AGE_ENTRIES = new LinkedHashMap<String,Integer>();
     static {
-        STATIC_AGE_ENTRIES.put("< 10 ans", 2);
-        STATIC_AGE_ENTRIES.put("10 - 15 ans", 12);
-        STATIC_AGE_ENTRIES.put("15 - 20 ans", 30);
-        STATIC_AGE_ENTRIES.put("20 - 25 ans", 28);
-        STATIC_AGE_ENTRIES.put("25 - 30 ans", 12);
-        STATIC_AGE_ENTRIES.put("30 - 50 ans", 8);
-        STATIC_AGE_ENTRIES.put("> 50 ans", 1);
-
         for (int i=1;i<100;i++) {
             char gender = (i % 2 == 0) ? 'M' : 'F';
             LiteDevice ld = new LiteDevice(gender, new Date(random(30,100), 11, 1), "debug",
@@ -77,7 +66,6 @@ public class ManagerReport extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager_report);
-
         chart = (BarChart)findViewById(R.id.barchart);
         fillBarChart(chart);
         // doit ressembler à ça = {"type":"line","data":{"series":[-3,2,3,4,5],"index":[2,3,4,5,6],"xaxis":"l'axe X"}}
@@ -95,7 +83,6 @@ public class ManagerReport extends AppCompatActivity {
                             .build();
                     response[0] = client.newCall(request).execute();
                     Log.e("RESPONSEBODY", response[0].body().string());
-
                     body = RequestBody.create(JSON, getAgeHistogramJSON());
                     request = new Request.Builder()
                             .url(LIGHTNING_PUBLIC_SESSION_URL)
@@ -117,7 +104,6 @@ public class ManagerReport extends AppCompatActivity {
     private String getProximityMatrixJSON() throws JSONException {
         TreeMap<Integer,Integer> map = LiteRecord.getProximityMatrix();
         // {"data":{"xaxis":"Année de naissance","yaxis":"Nombre","matrix":[[0,1],[3,-4]],"colormap":"Purples"},"options":{"numbers":true,"labels":true},"type":"matrix"}
-
         JSONArray matrix = new JSONArray();
         JSONArray line = new JSONArray();
         for(int i = 0 ; i < map.size()*2; i++)
@@ -155,18 +141,14 @@ public class ManagerReport extends AppCompatActivity {
         for(int i = 0 ; i < map.size()*2; i++)
             line.put(map.get(3));
         matrix.put(line);
-
         JSONObject data = new JSONObject();
         data.put("matrix", matrix);
-
         JSONObject options = new JSONObject();
         options.put("numbers",true);
-
         JSONObject output = new JSONObject();
         output.put("type","matrix");
         output.put("options",options);
         output.put("data",data);
-
         return output.toString();
     }
 
@@ -182,11 +164,9 @@ public class ManagerReport extends AppCompatActivity {
         }
         JSONObject data = new JSONObject();
         data.put("values", values);
-
         JSONObject output = new JSONObject();
         output.put("type","histogram");
         output.put("data",data);
-
         return output.toString();
     }
 
@@ -218,7 +198,6 @@ public class ManagerReport extends AppCompatActivity {
         TreeMap<Integer,Integer> map = LiteDevice.getCountByAge();
         ArrayList<String> xVals = new ArrayList<String>();
         ArrayList<BarEntry> yVals = new ArrayList<BarEntry>();
-
         int index = 0;
         for(Map.Entry<Integer,Integer> entry : map.entrySet()) {
             xVals.add(entry.getKey().toString());
@@ -226,7 +205,6 @@ public class ManagerReport extends AppCompatActivity {
             Log.e("GRAPH", entry.getKey() + " ll " + index);
             index++;
         }
-
         BarDataSet set = new BarDataSet(yVals, "");
         set.setColors(ColorTemplate.VORDIPLOM_COLORS);
         BarData data = new BarData(xVals, set);

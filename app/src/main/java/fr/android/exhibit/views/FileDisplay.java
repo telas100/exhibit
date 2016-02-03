@@ -1,7 +1,5 @@
 package fr.android.exhibit.views;
 
-import fr.android.exhibit.activities.R;
-
 /**
  * Created by Thibault on 20/01/2016.
  */

@@ -1,0 +1,138 @@
+@startuml
+package fr.android.exhibit.entities <<Database>> {
+LiteBeacon "1"-up-*"many" LiteRecord
+LiteRequest "many"*-up-"1" LiteFile
+
+package com.radiusnetwork.ibeacon {
+class IBeacon {
++{static}final int PROXIMITY_IMMEDIATE = 2
++{static}final int PROXIMITY_NEAR = 10
++{static}final int PROXIMITY_FAR = 15
+#String proximityUuid
+#int major
+#int minor
+#Integer proximity
+#Double accuracy
+#int rssi
+#int txPower
+#String bluetoothAddress
+#Double runningAverageRssi = null
+__
++{static}IBeacon fromScanData(byte[],int)
++{static}IBeacon fromScanData(byte[],int,BluetoothDevice)
+#{static}double calculateAccuracy(int,double)
+#{static}int calculateProximity(double)
+}
+note bottom
+Classe utilitaire permettant de récupérer
+les informations de proximité ainsi que de
+vérifier que l'appareil est en mode Beacon.
+end note
+}
+
+class LiteBeacon <extends com.activeandroid.Model> {
+-- @Table Beacons --
+@Column name
++String mName
+@Column uuid
++String mUuid
+@Column major
++int mMajor
+@Column minor
++int mMinor
+@Column mac
++String mAddress
+__
++LiteBeacon()
++LiteBeacon(String, String, String, int, int)
++{static}List<LiteBeacon> getAll()
++{static}List<LiteBeacon> getByAddress(String)
++String toString()
+}
+
+class LiteDevice <extends com.activeandroid.Model>{
+-- @Table Devices --
+@Column gender
++Character mGender
+@Column dob
++Date mDateOfBirth
+@Column name
++String mName
+@Column fname
++String mFirstName
+@Column email
++String mEmail
+@Column society
++String mSociety
+@Column mac
++String mAddress
+__
++LiteDevice()
++LiteDevice(Character,Date,String,String,String,String,String)
++{static}List<LiteDevice> getByName(String)
++{static}List<LiteDevice> getByAddress(String)
++{static}List<LiteDevice> getAll()
++{static}TreeMap<Integer, Integer> getCountByAge()
++void addParameter(Character,String)
++boolean isFullyRegistered()
++String getFullName()
++String toString()
+-void setGDOB(String)
+}
+
+class LiteFile <extends com.activeandroid.Model>{
+-- @Table Files --
+@Column name
++String mName
+__
++LiteFile()
++LiteFile(String)
++{static}List<LiteFile> getByName(String)
++{static}List<LiteFile> getAll()
++String toString()
+}
+
+class LiteRecord <extends com.activeandroid.Model>{
+-- @Table Records --
+@Column id_beacon
++LiteBeacon mBeacon
+@Column rssi
++int mRssi
+@Column proximity
++int mProximity
+@Column accuracy
++double mAccuracy
+@Column tx_power
++int mTxPower
+__
++LiteRecord()
++LiteRecord(LiteBeacon,int,int,double,int)
++{static}Map<Integer,Integer> getProximitiesCountsByAddress()
++{static}TreeMap<Integer,Integer> getProximityMatrix()()
++{static}List<LiteRecord> getAll()
++String toString()
+}
+
+class LiteRequest <extends com.activeandroid.Model>{
+-- @Table Requests --
+@Column mac
++String mAddress
+@Column id_file
++LiteFile mFile
+__
++LiteRequest()
++LiteRequest(String,LiteFile)
++{static}List<LiteRequest> getByAddress(String)
++{static}List<LiteRequest> getAll()
++{static}TreeMap<Integer, Integer> getCountByAge()
++{static}Integer getRequestCount()
++{static}Map<String,Integer> getMostRequestedFiles()
++String toString()
+}
+
+hide LiteDevice
+hide LiteBeacon
+hide LiteRecord
+}
+
+@enduml

@@ -18,21 +18,22 @@ import fr.android.exhibit.entities.LiteDevice;
 import fr.android.exhibit.entities.LiteRecord;
 
 /**
+ *
  * Created by Thibault on 08/01/2016.
  */
 public class BluetoothLEService extends IntentService {
     private static final long LESCAN_DURATION = 2000;
     private static final long RUNS_BEFORE_EMPTY_MESSAGE = 5;
     public static final String EXTRA_BEACON_NAME = "beacon_name";
-    private static final String LIGHTBLUEBEAN_UUID = "";
-    private static final int LIGHTBLUEBEAN_MAJOR = 0;
-    private static final int LIGHTBLUEBEAN_MINOR = 0;
+    private static final String LIGHTBLUEBEAN_UUID = "BEAC";
+    private static final int LIGHTBLUEBEAN_MAJOR = 7195;
+    private static final int LIGHTBLUEBEAN_MINOR = 42;
     private static int count = 0;
 
     /*
-    MAC ADRESSES
-    D0:39:72:C8:C7:00 - IBEACON Bean - BLE Bean270
-    B4:99:4C:1E:BC:07
+     *  - BEAN MAC ADRESSES -
+     *  D0:39:72:C8:C7:00
+     *  B4:99:4C:1E:BC:07
      */
 ;
     private boolean mInterrupted = false;
@@ -42,6 +43,21 @@ public class BluetoothLEService extends IntentService {
     private IBeacon mClosestBeacon;
     private LiteDevice mClosestDevice;
     private static BluetoothAdapter mAdapter;
+
+    /**
+     * Starts when the LE scan finds a device.
+     * In a new thread, the device is passed toward the IBeacon class to retreive it as a beacon
+     * if it is (else the beacon value is null).
+     * If it is not a beacon and it is assessed as one of the LightBlueBean BLE device, it looks for
+     * a "0:" like pattern. On a pattern found, it checks whether the device already exists or
+     * create a new one if it is new (based on MAC address). It then update the parameters define
+     * within the pattern if the LiteDevice object has still missing members.
+     * If it is a beacon and it is assessed as one of the LightBlueBean Beacon device, it tries to
+     * retrieve it from the database or it creates a new LiteBeacon. Then it registers a new record
+     * for the beacon.
+     * Finally it compares the distance of the beacon with the actual closest beacon to replace it
+     * if closest.
+     */
     private final BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
@@ -74,7 +90,7 @@ public class BluetoothLEService extends IntentService {
                                 }
                             } else if (beacon != null && device.getName() != null
                                     && device.getName() != EMPTY_BEAN
-                                    && isLightBlueBeanBeacon(beacon)) { // #2 - If the device is running on beacon mod
+                                    && isLightBlueBeanBeacon(beacon)) { // #2 - If the device is running on beacon mode
                                 List<LiteBeacon> bleBeacons = LiteBeacon.getByAddress(device.getAddress());
                                 LiteBeacon bleBeacon = null;
                                 if (bleBeacons.size() > 0) // #2.1 - The beacon exists within the database
@@ -102,6 +118,10 @@ public class BluetoothLEService extends IntentService {
                 }
             };
 
+    /*
+     * Return true on device being BLE and having a beacon already recorded
+     * Else return false
+     */
     private boolean isLightBlueBeanBluetooth(BluetoothDevice device) {
         if (device.getType() == BluetoothDevice.DEVICE_TYPE_LE)
             if (!LiteBeacon.getByAddress(device.getAddress()).isEmpty())
@@ -109,6 +129,10 @@ public class BluetoothLEService extends IntentService {
         return false;
     }
 
+    /*
+     * Return true on beacon meeting the LightblueBean default parameters
+     * Else return false
+     */
     private boolean isLightBlueBeanBeacon(IBeacon beacon) {
         if (beacon.getProximityUuid() == LIGHTBLUEBEAN_UUID
                 && beacon.getMajor() == LIGHTBLUEBEAN_MAJOR
@@ -116,14 +140,25 @@ public class BluetoothLEService extends IntentService {
             return true;
         return false;
     }
-
+    /*
+     * Default Constructor
+     */
     public BluetoothLEService() {
         super("BluetoothLEService");
         mThread = new Handler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mBroadcastManager = LocalBroadcastManager.getInstance(this);
+        Log.e("BLESERVICE_CLASS", "Service started.");
     }
 
+    /*
+     * When the service starts it enters an infinite loop (stopped only on demand)
+     * which starts a LE scan having the mLeScanCallback as runnable function on finding a LE
+     * device. It stops the LE scan after LESCAN_DURATION milliseconds and broadcast an intent
+     * with the name of the closest device found (set within the mLeScanCallback function).
+     * Every RUNS_BEFORE_EMPTY_MESSAGE loops count, if the closest device has not changed during
+     * those loops, the closest device is set to null.
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
         int i = 1;
@@ -158,10 +193,19 @@ public class BluetoothLEService extends IntentService {
         }
     }
 
+    /*
+     * Run a Runnable in background.
+     * Used within the onLeScanCallback function to handle a response separatly from the main
+     * LE scan.
+     */
     private void runOnThread(Runnable runnable){
         mThread.post(runnable);
     }
 
+    /*
+     * Default destructor.
+     * Stop the onHandleIntent function.
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();

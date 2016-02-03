@@ -1,0 +1,52 @@
+@startuml
+actor Bracelet
+control BluetoothLEService
+entity MainActivity
+entity FilePicker
+database Exhibit.db
+
+activate MainActivity
+MainActivity -> BluetoothLEService : startService()
+activate BluetoothLEService
+loop infinite
+BluetoothLEService -> BluetoothLEService : startLeScan() [threaded]
+BluetoothLEService -> BluetoothLEService : wait(LESCAN_DURATION)
+...
+== ON BLE RECORD RECEIVED ==
+Bracelet -> BluetoothLEService : broadcastBLE()
+BluetoothLEService -> Exhibit.db : LiteDevice.getByAddress(address)
+Exhibit.db --> BluetoothLEService : return List<LiteDevice>
+alt empty List
+    BluetoothLEService -> Exhibit.db : create new LiteDevice
+end
+BluetoothLEService -> Exhibit.db : updateDevice()
+...
+== ON BEACON RECEIVED ==
+Bracelet -> BluetoothLEService : broadcastBeacon()
+BluetoothLEService -> Exhibit.db : LiteBeacon.getByAddress(address)
+Exhibit.db --> BluetoothLEService : return List<LiteBeacon>
+alt empty List
+    BluetoothLEService -> Exhibit.db : create new LiteBeacon
+end
+BluetoothLEService -> Exhibit.db : create new LiteRecord(LiteBeacon)
+BluetoothLEService -> BluetoothLEService : updateClosestBeacon()
+...
+==AFTER LESCAN_DURATION\n[Page d'accueil]==
+BluetoothLEService -> BluetoothLEService : stopLeScan()
+BluetoothLEService -> MainActivity : sendBroadcast(closestBeacon)
+MainActivity -> MainActivity : setText()
+...
+==AFTER LESCAN_DURATION\n[Autre activité]==
+MainActivity -> FilePicker
+deactivate MainActivity
+activate FilePicker
+BluetoothLEService -> BluetoothLEService : stopLeScan()
+BluetoothLEService ->X MainActivity : sendBroadcast(closestBeacon)
+FilePicker -> MainActivity
+deactivate FilePicker
+activate MainActivity
+end
+MainActivity -> BluetoothLEService : stopService()
+deactivate BluetoothLEService
+deactivate MainActivity
+@enduml

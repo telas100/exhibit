@@ -11,7 +11,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -22,6 +21,7 @@ import fr.android.exhibit.views.FileDisplay;
 import fr.android.exhibit.views.FileDisplayAdapter;
 
 public class FilePicker extends AppCompatActivity {
+    private static final int COLUMN_NUMBER = 4;
     private List<FileDisplay> list_files;
     private int mToSend = 0;
     private List<String> mFilesString;
@@ -55,7 +55,7 @@ public class FilePicker extends AppCompatActivity {
         mRecyclerView = (RecyclerView)findViewById(R.id.fpa_rv_files_list);
         mLayout = (CoordinatorLayout)findViewById(R.id.fpa_cl_layout);
 
-        GridLayoutManager layoutManager = new GridLayoutManager((Context)this, 4);
+        GridLayoutManager layoutManager = new GridLayoutManager((Context)this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
 
         FileDisplayAdapter viewAdapter = new FileDisplayAdapter(list_files);

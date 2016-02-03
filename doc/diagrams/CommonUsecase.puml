@@ -1,0 +1,61 @@
+@startuml
+actor Utilisateur
+entity MainActivity
+entity FilePicker
+entity NfcPrompter
+control NfcForegroundUtil
+entity ManagerReport
+
+activate MainActivity
+Utilisateur -> MainActivity : View.onClick()
+MainActivity -> FilePicker : startActivity()
+deactivate MainActivity
+activate FilePicker
+Utilisateur -> FilePicker : FloatingActionButton.onClick()
+alt selectedFiles.size() == 0
+    FilePicker -> FilePicker : displaySnackbar()
+else
+    FilePicker -> FilePicker : setExtra()
+    FilePicker -> NfcPrompter : startActivity()
+    deactivate FilePicker
+    activate NfcPrompter
+end
+NfcPrompter -> NfcForegroundUtil : enableForeground()
+activate NfcForegroundUtil
+Utilisateur -> NfcForegroundUtil : onNfcRead()
+NfcForegroundUtil -> NfcPrompter : onNewIntent()
+alt content == MANAGER_BRACELET
+    NfcPrompter -> NfcPrompter : displayButton()
+    Utilisateur -> NfcPrompter : FloatingActionButton.onClick()
+    NfcPrompter -> NfcForegroundUtil : disableForeground()
+    deactivate NfcForegroundUtil
+    NfcPrompter -> ManagerReport : startActivity()
+    deactivate NfcPrompter
+    activate ManagerReport
+    ManagerReport --> : sendData()
+    Utilisateur -> ManagerReport : ReturnButton.onClick()
+    ManagerReport -> NfcPrompter
+    deactivate ManagerReport
+    activate NfcPrompter
+    NfcPrompter -> NfcForegroundUtil : enableForeground()
+    activate NfcForegroundUtil
+else content is MAC address
+    alt MAC address found in database
+        NfcPrompter -> NfcPrompter : save()
+    else
+        NfcPrompter -> NfcPrompter : displayNotFoundError()
+    end
+else
+    NfcPrompter -> NfcPrompter : displayUnreadableError()
+end
+Utilisateur -> NfcPrompter : ReturnButton.onClick()
+NfcPrompter -> NfcForegroundUtil : disableForeground()
+deactivate NfcForegroundUtil
+NfcPrompter -> FilePicker : resumeActivity()
+deactivate NfcPrompter
+activate FilePicker
+Utilisateur -> FilePicker : ReturnButton.onClick()
+FilePicker -> MainActivity : resumeActivity()
+deactivate FilePicker
+activate MainActivity
+@enduml

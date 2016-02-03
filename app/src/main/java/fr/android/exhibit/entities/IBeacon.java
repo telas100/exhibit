@@ -25,7 +25,6 @@ package fr.android.exhibit.entities;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
-import android.util.Log;
 
 /**
  * The <code>IBeacon</code> class represents a single hardware iBeacon detected by

@@ -1,0 +1,52 @@
+@startuml
+title Fonctionnement du scan BLE
+(*)  --> "Capte un appareil Bluetooth"
+--> "Démarre un <b>Thread</b>"
+--> "Génère une entité <i>IBeacon</i> via l'enregistrement Bluetooth"
+note right
+ Si les paquets reçus sont issus d'un périphérique
+ en mode beacon la classe IBeacon renvoie
+ une entité sinon elle renvoit NULL.
+end note
+If "Friendly name != null && Friendly name != EMPTY_BEAN" then
+-down-> [True] If IBeacon is null && isLightBlueBeanBluetooth() then
+--> [True] Récupère le contenu du friendly name
+If "[0-4]{1}[:] pattern is found" then
+--> [True] Récupère l'addresse MAC du bracelet [BLE]
+If "LiteDevice.getByAddress(address) is empty" then
+--> [True] "Ajoute un nouveau LiteDevice à la base de données"
+--> "Met à jour la valeur trouvée si non renseignée"
+else
+--> [False] "Met à jour la valeur trouvée si non renseignée"
+--> "Arrête le <b>Thread</b>"
+Endif
+else
+--> [False] "Arrête le <b>Thread</b>"
+Endif
+else
+--> [False] "Arrête le <b>Thread</b>"
+Endif
+else
+--> [False] If "IBeacon is not null && isLightBlueBeanBeacon()" then
+--> [True] Récupère l'addresse MAC du bracelet [BEACON]
+If "LiteBeacon.getByAddress(address) is empty" then
+--> [True] "Ajoute un nouveau LiteBeacon à la base de données"
+--> "Ajoute un nouveau LiteRecord à la base de données"
+else
+--> [False] "Ajoute un nouveau LiteRecord à la base de données"
+Endif
+If "closestBeacon is null || closestBeacon.accuracy < beacon.accuracy" then
+--> [True] Récupère le LiteDevice correspondant au beacon
+If "LiteDevice.isFullyRegistered()"
+--> [True] closestBeacon = beacon
+--> "Arrête le <b>Thread</b>"
+else
+--> [False] "Arrête le <b>Thread</b>"
+Endif
+else
+--> [False] "Arrête le <b>Thread</b>"
+Endif
+Endif
+Endif
+-->(*)
+@enduml

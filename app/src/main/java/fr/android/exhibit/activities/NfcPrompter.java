@@ -10,9 +10,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -33,12 +31,11 @@ import fr.android.exhibit.entities.LiteDevice;
 import fr.android.exhibit.entities.LiteFile;
 import fr.android.exhibit.entities.LiteRecord;
 import fr.android.exhibit.entities.LiteRequest;
-import fr.android.exhibit.services.BluetoothLEService;
 import fr.android.exhibit.services.NFCForegroundUtil;
 
 public class NfcPrompter extends AppCompatActivity {
 
-    private static final CharSequence MANAGER_BRACELET = "DEDE";
+    private static final CharSequence MANAGER_BRACELET = "MANAGER";
     private static final CharSequence RESET_STRING = "RESET";
     private static AlphaAnimation mBlink;
     private static TextView mPrompter;
